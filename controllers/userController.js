@@ -6,7 +6,7 @@ const asyncHandler = require('express-async-handler');
 // @route   POST /api/users
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
-	const { name, email, password } = req.body;
+	const { firstname, lastname, email, password } = req.body;
 
 	const userExists = await User.findOne({ email });
 
@@ -16,7 +16,8 @@ const registerUser = asyncHandler(async (req, res) => {
 	}
 
 	const user = await User.create({
-		name,
+		firstname,
+		lastname,
 		email,
 		password,
 	});
@@ -24,7 +25,8 @@ const registerUser = asyncHandler(async (req, res) => {
 	if (user) {
 		res.status(201).json({
 			_id: user._id,
-			name: user.name,
+			firstname: user.firstname,
+			lastname: user.lastname,
 			email: user.email,
 			token: generateToken(user._id),
 		});
@@ -45,7 +47,8 @@ const authUser = asyncHandler(async (req, res) => {
 	if (user && (await user.matchPassword(password))) {
 		res.json({
 			_id: user._id,
-			name: user.name,
+			firstname: user.firstname,
+			lastname: user.lastname,
 			email: user.email,
 			token: generateToken(user._id),
 		});

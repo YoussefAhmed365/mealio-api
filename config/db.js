@@ -1,4 +1,3 @@
-// Import mongoose for MongoDB interaction
 const mongoose = require('mongoose');
 
 // Define an asynchronous function to connect to the database
