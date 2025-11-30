@@ -45,12 +45,18 @@ const authUser = asyncHandler(async (req, res) => {
 	const user = await User.findOne({ email });
 
 	if (user && (await user.matchPassword(password))) {
+		res.cookie('token', generateToken(user._id), {
+			httpOnly: true,
+			secure: process.env.NODE_ENV !== 'development',
+			sameSite: 'strict',
+			maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+		});
+		
 		res.json({
 			_id: user._id,
 			firstname: user.firstname,
 			lastname: user.lastname,
 			email: user.email,
-			token: generateToken(user._id),
 		});
 	} else {
 		res.status(401);
@@ -58,4 +64,11 @@ const authUser = asyncHandler(async (req, res) => {
 	}
 });
 
-module.exports = { registerUser, authUser };
+// @desc    Logout user
+// @route   POST /api/users/logout
+// @access  Public
+const logoutUser = asyncHandler(async (_req, res) => {
+	res.clearCookie('token');
+});
+
+module.exports = { registerUser, authUser, logoutUser };
