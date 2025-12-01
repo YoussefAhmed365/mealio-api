@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 // Nested schema for individual ingredients
 const ingredientSchema = new mongoose.Schema({
@@ -43,4 +43,4 @@ const mealPlanSchema = new mongoose.Schema({
 
 const MealPlan = mongoose.model('MealPlan', mealPlanSchema);
 
-module.exports = MealPlan;
+export default MealPlan;

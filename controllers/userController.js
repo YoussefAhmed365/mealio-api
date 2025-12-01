@@ -1,12 +1,12 @@
-const User = require('../models/userModel.js');
-const generateToken = require('../utils/generateToken.js');
-const asyncHandler = require('express-async-handler');
+import User from '../models/userModel.js';
+import generateToken from '../utils/generateToken.js';
+import asyncHandler from 'express-async-handler';
 
 // @desc    Register a new user
-// @route   POST /api/users
+// @route   POST /api/users/signup
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
-	const { firstname, lastname, email, password } = req.body;
+	const { firstname, lastname, email, password, remember = false } = req.body;
 
 	const userExists = await User.findOne({ email });
 
@@ -23,12 +23,12 @@ const registerUser = asyncHandler(async (req, res) => {
 	});
 
 	if (user) {
+		generateToken(res, user._id, remember);
 		res.status(201).json({
 			_id: user._id,
 			firstname: user.firstname,
 			lastname: user.lastname,
 			email: user.email,
-			token: generateToken(user._id),
 		});
 	} else {
 		res.status(400);
@@ -40,18 +40,12 @@ const registerUser = asyncHandler(async (req, res) => {
 // @route   POST /api/users/login
 // @access  Public
 const authUser = asyncHandler(async (req, res) => {
-	const { email, password } = req.body;
+	const { email, password, remember } = req.body;
 
 	const user = await User.findOne({ email });
 
 	if (user && (await user.matchPassword(password))) {
-		res.cookie('token', generateToken(user._id), {
-			httpOnly: true,
-			secure: process.env.NODE_ENV !== 'development',
-			sameSite: 'strict',
-			maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-		});
-		
+		generateToken(res, user._id, remember);
 		res.json({
 			_id: user._id,
 			firstname: user.firstname,
@@ -60,15 +54,36 @@ const authUser = asyncHandler(async (req, res) => {
 		});
 	} else {
 		res.status(401);
-		throw new Error('Invalid email or password');
+		if (user) {
+			throw new Error('Invalid email or password');
+		} else {
+			throw new Error('This email is not registered, Would you like to register?');
+
+		}
 	}
 });
 
-// @desc    Logout user
+// @desc    Get current user profile (Check Auth)
+// @route   GET /api/users/profile
+// @access  Private
+const getUserProfile = asyncHandler(async (req, res) => {
+	const user = {
+		_id: req.user._id,
+		name: req.user.name,
+		email: req.user.email,
+	};
+	res.status(200).json(user);
+});
+
+// @desc    Logout user / clear cookie
 // @route   POST /api/users/logout
 // @access  Public
 const logoutUser = asyncHandler(async (_req, res) => {
-	res.clearCookie('token');
+	res.cookie('jwt', '', {
+		httpOnly: true,
+		expires: new Date(0), // حذف الكوكيز فوراً
+	});
+	res.status(200).json({ message: 'Logged out successfully' });
 });
 
-module.exports = { registerUser, authUser, logoutUser };
+export { registerUser, authUser, getUserProfile, logoutUser };

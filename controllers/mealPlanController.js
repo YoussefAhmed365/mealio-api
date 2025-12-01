@@ -1,6 +1,6 @@
-const MealPlan = require('../models/mealPlanModel.js');
-const { v4: uuidv4 } = require('uuid');
-const asyncHandler = require('express-async-handler');
+import MealPlan from '../models/mealPlanModel.js';
+import { v4 as uuidv4 } from 'uuid';
+import asyncHandler from 'express-async-handler';
 
 // @desc    Create a new meal plan
 // @route   POST /api/mealplans
@@ -38,4 +38,4 @@ const getMyMealPlans = asyncHandler(async (req, res) => {
     res.json(mealPlans);
 });
 
-module.exports = { createMealPlan, getMyMealPlans };
+export { createMealPlan, getMyMealPlans };
