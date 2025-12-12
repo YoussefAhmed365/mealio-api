@@ -76,6 +76,35 @@ const getUserProfile = asyncHandler(async (req, res) => {
 	res.status(200).json(user);
 });
 
+// @desc    Update user profile
+// @route   PUT /api/users/profile
+// @access  Private
+const updateUserProfile = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+        user.firstname = req.body.firstname || user.firstname;
+        user.lastname = req.body.lastname || user.lastname;
+        user.email = req.body.email || user.email;
+
+        if (req.body.password) {
+            user.password = req.body.password;
+        }
+
+        const updatedUser = await user.save();
+
+        res.status(200).json({
+            _id: updatedUser._id,
+            firstname: updatedUser.firstname,
+            lastname: updatedUser.lastname,
+            email: updatedUser.email,
+        });
+    } else {
+        res.status(404);
+        throw new Error('User not found');
+    }
+});
+
 // @desc    Logout user / clear cookie
 // @route   POST /api/users/logout
 // @access  Public
@@ -87,4 +116,4 @@ const logoutUser = asyncHandler(async (_req, res) => {
 	res.status(200).json({ message: 'Logged out successfully' });
 });
 
-export { registerUser, authUser, getUserProfile, logoutUser };
+export { registerUser, authUser, getUserProfile, updateUserProfile, logoutUser };
