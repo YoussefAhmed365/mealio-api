@@ -69,7 +69,8 @@ const authUser = asyncHandler(async (req, res) => {
 const getUserProfile = asyncHandler(async (req, res) => {
 	const user = {
 		_id: req.user._id,
-		name: req.user.name,
+		firstname: req.user.firstname,
+		lastname: req.user.lastname,
 		email: req.user.email,
 	};
 	res.status(200).json(user);

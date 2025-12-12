@@ -4,7 +4,7 @@ import { protect } from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 router.post('/register', registerUser);
-router.post('/login', authUser);
+router.post('/login', authUser); // TODO: show the remember boolean in the response for testing
 router.post('/logout', logoutUser);
 router.get('/profile', protect, getUserProfile);
 
