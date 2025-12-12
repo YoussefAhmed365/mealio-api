@@ -5,8 +5,9 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { connectDB } from './config/db.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
-import mealPlanRoutes from './routes/mealPlanRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
+import mealPlanRoutes from './routes/mealPlanRoutes.js';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -32,6 +33,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Use the user routes
 app.use('/api/users', userRoutes);
+
+// Use the notification routes
+app.use('/api/notifications', notificationRoutes);
 
 // Use the meal plan routes
 app.use('/api/meal-plans', mealPlanRoutes);
