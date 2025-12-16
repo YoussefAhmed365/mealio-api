@@ -67,12 +67,18 @@ const authUser = asyncHandler(async (req, res) => {
 // @route   GET /api/users/profile
 // @access  Private
 const getUserProfile = asyncHandler(async (req, res) => {
+	if (!req.user) {
+		res.status(401);
+		throw new Error('User not found');
+	}
+
 	const user = {
 		_id: req.user._id,
 		firstname: req.user.firstname,
 		lastname: req.user.lastname,
 		email: req.user.email,
 	};
+
 	res.status(200).json(user);
 });
 
@@ -113,7 +119,7 @@ const logoutUser = asyncHandler(async (_req, res) => {
 		httpOnly: true,
 		expires: new Date(0), // حذف الكوكيز فوراً
 	});
-	res.status(200).json({ message: 'Logged out successfully' });
+	res.status(200).json({ message: 'User logged out' });
 });
 
 export { registerUser, authUser, getUserProfile, updateUserProfile, logoutUser };

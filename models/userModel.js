@@ -19,6 +19,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    status: {
+        type: String,
+        enum: ['active', 'inactive', 'pending_verification'],
+        default: 'pending_verification',
+    },
     mealPlans: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'MealPlan',
