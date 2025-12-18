@@ -8,16 +8,20 @@ const ingredientSchema = new mongoose.Schema({
 
 // Nested schema for individual meals (e.g., breakfast, lunch)
 const mealSchema = new mongoose.Schema({
-    meal_name: { type: String, required: true },
+    mealName: { type: String, required: true },
     description: { type: String },
     ingredients: [ingredientSchema],
-    preparation_steps: [String],
-    not_available_ingredients: [String],
+    preparationSteps: [String],
+    unavailableIngredients: [String],
 }, { _id: false });
 
 // Nested schema for a single day's meals
 const dayMealSchema = new mongoose.Schema({
-    dayOfWeek: { type: String, required: true },
+    dayOfWeek: {
+        type: String,
+        required: true,
+        enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    },
     meals: [mealSchema],
 }, { _id: false });
 

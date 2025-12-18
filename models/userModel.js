@@ -19,15 +19,18 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    status: {
-        type: String,
-        enum: ['active', 'inactive', 'pending_verification'],
-        default: 'pending_verification',
-    },
     mealPlans: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'MealPlan',
     }],
+    notifications: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Notification',
+    }],
+    mealPreferences: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'MealPreferences',
+    },
 }, {
     timestamps: true, // Adds createdAt and updatedAt timestamps
 });
@@ -38,10 +41,10 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
 };
 
 // Middleware to hash password before saving a new user
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', async function () {
     // Only hash the password if it has been modified (or is new)
     if (!this.isModified('password')) {
-        next();
+        return;
     }
 
     // Generate a salt and hash the password

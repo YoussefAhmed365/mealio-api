@@ -7,6 +7,7 @@ import { connectDB } from './config/db.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import userRoutes from './routes/userRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+import mealPreferencesRoutes from './routes/mealPreferencesRoutes.js';
 import mealPlanRoutes from './routes/mealPlanRoutes.js';
 
 // Load environment variables from .env file
@@ -36,6 +37,9 @@ app.use('/api/users', userRoutes);
 
 // Use the notification routes
 app.use('/api/notifications', notificationRoutes);
+
+// Use the meal preferences routes
+app.use('/api/meal-preferences', mealPreferencesRoutes);
 
 // Use the meal plan routes
 app.use('/api/meal-plans', mealPlanRoutes);
