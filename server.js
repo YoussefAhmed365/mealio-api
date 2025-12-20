@@ -13,6 +13,8 @@ import mealPlanRoutes from './routes/mealPlanRoutes.js';
 // Load environment variables from .env file
 dotenv.config();
 
+const corsOrigin = process.env.FRONTEND_URL || 'http://localhost:5173';
+
 // Connect to the MongoDB database
 connectDB();
 
@@ -24,7 +26,7 @@ app.use(cookieParser());
 
 // Enable Cross-Origin Resource Sharing (CORS) for all routes
 app.use(cors({
-    origin: 'http://localhost:5173', // React App Port
+    origin: corsOrigin,
     credentials: true,
 }));
 
