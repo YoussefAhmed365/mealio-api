@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    profilePhoto: {
+        type: String,
+        default: 'public/profiles/default.webp',
+    },
     mealPlans: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'MealPlan',
