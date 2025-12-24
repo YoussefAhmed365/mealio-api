@@ -130,40 +130,30 @@ const updateProfilePhoto = asyncHandler(async (req, res) => {
 	const user = await User.findById(req.user._id);
 
 	if (user) {
-		// Delete old photo if it exists and is not the default one
-		if (
-			user.profilePhoto &&
-			!user.profilePhoto.includes('default.webp') &&
-			user.profilePhoto.startsWith(`/profiles/${user._id}/`)
-		) {
-			const oldPhotoPath = path.join(
-				__dirname,
-				'../public',
-				user.profilePhoto
-			);
+		// User Folder Path
+		const userFolder = path.join(__dirname, `../public/profiles/${user._id}`);
+
+		// Ensure user folder exists
+		if (!fs.existsSync(userFolder)) {
+			fs.mkdirSync(userFolder, { recursive: true });
+		}
+
+		// Generate Unique Name
+		const photoName = `${user._id}-${Date.now()}.webp`;
+		const filePath = path.join(userFolder, photoName);
+
+		// Delete old photo if it exists and is not default
+		if (user.profilePhoto && !user.profilePhoto.includes('default.webp')) {
+			const oldPhotoPath = path.join(__dirname, `../public${user.profilePhoto}`);
 			if (fs.existsSync(oldPhotoPath)) {
 				fs.unlinkSync(oldPhotoPath);
 			}
 		}
 
-		user.profilePhoto = req.file.path;
-		// Create directory if it doesn't exist
-		// directory will be "public/profiles/{user._id}"
-		const userDir = path.join(__dirname, `../public/profiles/${user._id}`);
-		if (!fs.existsSync(userDir)) {
-			fs.mkdirSync(userDir, { recursive: true });
-		}
+		// Save new photo
+		fs.writeFileSync(filePath, req.file.buffer);
 
-		// Generate unique filename
-		const fileExt = path.extname(req.file.originalname);
-		const fileName = `${req.file.filename || Date.now()}${fileExt}`; // Fallback if filename not set
-		const filePath = path.join(userDir, fileName);
-
-		// Move file (using renameSync as per user snippet, assuming req.file.path is a temp path)
-		// Note: req.file.path comes from multer.
-		fs.renameSync(req.file.path, filePath);
-
-		user.profilePhoto = `/profiles/${user._id}/${fileName}`;
+		user.profilePhoto = `/profiles/${user._id}/${photoName}`;
 		const updatedUser = await user.save();
 
 		res.status(200).json({

@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema({
     },
     profilePhoto: {
         type: String,
-        default: 'public/profiles/default.webp',
+        default: '/profiles/default.webp',
     },
     mealPlans: [{
         type: mongoose.Schema.Types.ObjectId,
