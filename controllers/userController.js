@@ -12,7 +12,7 @@ const __dirname = path.dirname(__filename);
 // @route   POST /api/users/signup
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
-	const { firstname, lastname, email, password, remember = false } = req.body;
+	const { firstname, lastname, email, password, remember = true } = req.body;
 
 	const userExists = await User.findOne({ email });
 
@@ -29,12 +29,13 @@ const registerUser = asyncHandler(async (req, res) => {
 	});
 
 	if (user) {
-		generateToken(res, user._id, remember);
+		const token = generateToken(res, user._id, remember);
 		res.status(201).json({
 			_id: user._id,
 			firstname: user.firstname,
 			lastname: user.lastname,
 			email: user.email,
+			token,
 		});
 	} else {
 		res.status(400);
@@ -51,12 +52,13 @@ const authUser = asyncHandler(async (req, res) => {
 	const user = await User.findOne({ email });
 
 	if (user && (await user.matchPassword(password))) {
-		generateToken(res, user._id, remember);
+		const token = generateToken(res, user._id, remember);
 		res.json({
 			_id: user._id,
 			firstname: user.firstname,
 			lastname: user.lastname,
 			email: user.email,
+			token,
 		});
 	} else {
 		res.status(401);
@@ -100,9 +102,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 		user.lastname = req.body.lastname || user.lastname;
 		user.email = req.body.email || user.email;
 
-		if (req.body.password) {
-			user.password = req.body.password;
-		}
+		if (req.body.password) user.password = req.body.password;
 
 		const updatedUser = await user.save();
 
@@ -134,9 +134,7 @@ const updateProfilePhoto = asyncHandler(async (req, res) => {
 		const userFolder = path.join(__dirname, `../public/profiles/${user._id}`);
 
 		// Ensure user folder exists
-		if (!fs.existsSync(userFolder)) {
-			fs.mkdirSync(userFolder, { recursive: true });
-		}
+		if (!fs.existsSync(userFolder)) fs.mkdirSync(userFolder, { recursive: true });
 
 		// Generate Unique Name
 		const photoName = `${user._id}-${Date.now()}.webp`;
@@ -145,9 +143,7 @@ const updateProfilePhoto = asyncHandler(async (req, res) => {
 		// Delete old photo if it exists and is not default
 		if (user.profilePhoto && !user.profilePhoto.includes('default.webp')) {
 			const oldPhotoPath = path.join(__dirname, `../public${user.profilePhoto}`);
-			if (fs.existsSync(oldPhotoPath)) {
-				fs.unlinkSync(oldPhotoPath);
-			}
+			if (fs.existsSync(oldPhotoPath)) fs.unlinkSync(oldPhotoPath);
 		}
 
 		// Save new photo
