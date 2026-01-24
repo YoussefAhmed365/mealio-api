@@ -31,7 +31,7 @@ app.use(cors({
         if (!origin) return callback(null, true);
 
         const allowedOrigins = [corsOrigin];
-        if (allowedOrigins.indexOf(origin) !== -1 || origin.startsWith('http://192.168.') || origin.startsWith('http://10.') || origin.startsWith('http://localhost') || origin.startsWith('http://172.')) {
+        if (allowedOrigins.indexOf(origin) !== -1 || origin.startsWith('http://192.168.') || origin.startsWith('http://10.') || origin.startsWith('http://localhost') || origin.startsWith('http://172.') || origin.startsWith('https:https://mealio-three.vercel.app')) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
