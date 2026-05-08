@@ -8,7 +8,10 @@ import {
     getUserProfile,
     updateUserProfile,
     updateProfilePhoto,
-    logoutUser
+    logoutUser,
+    sendOtp,
+    verifyOtp,
+    resetPassword
 } from '../controllers/userController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
@@ -23,15 +26,15 @@ const upload = multer({
             cb(null, 'public/profiles/'); // Save to temp or directly, controller handles moving/renaming usually, but here we can just save to profiles and ensure unique names
         },
         filename: (req, file, cb) => {
-             // We will handle the exact path in the controller or just let multer save a temp name
-             // Actually, plan said save to public/profiles/{userId}. 
-             // To do that in multer config, we need to create the dir.
-             // Simpler: Upload to a temp dir 'public/temp' or just 'public/profiles' with unique name, then move/rename in controller.
-             // OR: Use memory storage and write buffer in controller. 
-             // Let's use diskStorage to 'public/profiles' with a temp name, or pass to controller.
-             // The specific requirement: "public/profiles/{user._id}/UNIQUE_NAME.webp"
-             // Since we need to ensure the dir exists, doing it in controller is safer/easier than dynamic multer destination config unless we use `fs` here.
-             cb(null, file.fieldname + '-' + Date.now() + Math.round(Math.random() * 1E9) + path.extname(file.originalname));
+            // We will handle the exact path in the controller or just let multer save a temp name
+            // Actually, plan said save to public/profiles/{userId}. 
+            // To do that in multer config, we need to create the dir.
+            // Simpler: Upload to a temp dir 'public/temp' or just 'public/profiles' with unique name, then move/rename in controller.
+            // OR: Use memory storage and write buffer in controller. 
+            // Let's use diskStorage to 'public/profiles' with a temp name, or pass to controller.
+            // The specific requirement: "public/profiles/{user._id}/UNIQUE_NAME.webp"
+            // Since we need to ensure the dir exists, doing it in controller is safer/easier than dynamic multer destination config unless we use `fs` here.
+            cb(null, file.fieldname + '-' + Date.now() + Math.round(Math.random() * 1E9) + path.extname(file.originalname));
         }
     })
 });
@@ -47,6 +50,9 @@ const memUpload = multer({ storage: multer.memoryStorage() });
 router.post('/register', registerUser);
 router.post('/login', authUser);
 router.post('/logout', logoutUser);
+router.post('/send-otp', sendOtp);
+router.post('/verify-otp', verifyOtp);
+router.post('/reset-password', resetPassword);
 router
     .route('/profile')
     .get(protect, getUserProfile)

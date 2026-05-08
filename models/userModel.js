@@ -23,6 +23,12 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: '/profiles/default.webp',
     },
+    otp: {
+        type: String,
+    },
+    otpExpires: {
+        type: Date,
+    },
     mealPlans: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'MealPlan',

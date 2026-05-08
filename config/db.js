@@ -1,7 +1,13 @@
-import { connect } from 'mongoose';
+import mongoose, { connect } from 'mongoose';
 
 // Define an asynchronous function to connect to the database
 const connectDB = async () => {
+    // Check if DB is connected
+    if (mongoose.connection.readyState === 1) {
+        console.log('MongoDB already connected');
+        return;
+    }
+
     try {
         // Attempt to connect to MongoDB using the URI from environment variables
         const conn = await connect(process.env.MONGO_URI);

@@ -173,4 +173,64 @@ const logoutUser = asyncHandler(async (_req, res) => {
 	res.status(200).json({ message: 'User logged out' });
 });
 
-export { registerUser, authUser, getUserProfile, updateUserProfile, updateProfilePhoto, logoutUser };
+// @desc    Send OTP to email
+// @route   POST /api/users/send-otp
+// @access  Public
+const sendOtp = asyncHandler(async (req, res) => {
+	const { email } = req.body;
+	const user = await User.findOne({ email });
+
+	if (user) {
+		const otp = Math.floor(100000 + Math.random() * 900000).toString();
+		user.otp = otp;
+		user.otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+		await user.save();
+
+		// MOCK EMAIL SENDING
+		console.log(`----------------------------------------------------`);
+		console.log(`Sending OTP to ${email}: ${otp}`);
+		console.log(`----------------------------------------------------`);
+
+		res.status(200).json({ message: 'OTP sent to email (Check Server Console)' });
+	} else {
+		res.status(404);
+		throw new Error('User not found');
+	}
+});
+
+// @desc    Verify OTP
+// @route   POST /api/users/verify-otp
+// @access  Public
+const verifyOtp = asyncHandler(async (req, res) => {
+	const { email, otp } = req.body;
+	const user = await User.findOne({ email });
+
+	if (user && user.otp === otp && user.otpExpires > Date.now()) {
+		res.status(200).json({ message: 'OTP Verified' });
+	} else {
+		res.status(400);
+		throw new Error('Invalid or expired OTP');
+	}
+});
+
+// @desc    Reset Password with OTP
+// @route   POST /api/users/reset-password
+// @access  Public
+const resetPassword = asyncHandler(async (req, res) => {
+	const { email, otp, newPassword } = req.body;
+	const user = await User.findOne({ email });
+
+	if (user && user.otp === otp && user.otpExpires > Date.now()) {
+		user.password = newPassword;
+		user.otp = undefined;
+		user.otpExpires = undefined;
+		await user.save();
+
+		res.status(200).json({ message: 'Password Reset Successfully' });
+	} else {
+		res.status(400);
+		throw new Error('Invalid or expired OTP');
+	}
+});
+
+export { registerUser, authUser, getUserProfile, updateUserProfile, updateProfilePhoto, logoutUser, sendOtp, verifyOtp, resetPassword };
