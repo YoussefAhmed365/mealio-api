@@ -1,6 +1,6 @@
 // Import required packages
+import 'dotenv/config';
 import express from 'express';
-import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { connectDB } from './config/db.js';
@@ -9,9 +9,7 @@ import userRoutes from './routes/userRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import mealPreferencesRoutes from './routes/mealPreferencesRoutes.js';
 import mealPlanRoutes from './routes/mealPlanRoutes.js';
-
-// Load environment variables from .env file
-dotenv.config();
+import agentRoutes from './routes/agentRoutes.js';
 
 const corsOrigin = process.env.FRONTEND_URL || 'http://localhost:5173';
 
@@ -62,6 +60,9 @@ app.use('/api/meal-preferences', mealPreferencesRoutes);
 
 // Use the meal plan routes
 app.use('/api/meal-plans', mealPlanRoutes);
+
+// Use the agent routes
+app.use('/api/agent', agentRoutes);
 
 app.get('/', (_req, res) => { res.send('Server is Ready.') });
 
