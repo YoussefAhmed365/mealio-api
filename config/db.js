@@ -17,8 +17,8 @@ const connectDB = async () => {
     } catch (error) {
         // Log any errors that occur during connection
         console.error(`Error: ${error.message}`);
-        // Exit the process with a failure code if connection fails
-        process.exit(1);
+        // Do NOT call process.exit(1) in serverless environments, as it crashes the entire container,
+        // preventing CORS headers from being returned for preflight/failed requests.
     }
 };
 
