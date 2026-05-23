@@ -6,7 +6,7 @@ import asyncHandler from "express-async-handler";
 // @route   POST /api/meal-preferences
 // @access  Private - Authenticated users only
 const saveMealPreferences = asyncHandler(async (req, res) => {
-    const { preferences, persons, budget, trackingOption } = req.body;
+    const { preferences, persons, budget, trackingOption, culturalCuisine, unitOfMeasurement } = req.body;
 
     if (!preferences || !persons || !budget || !trackingOption) {
         res.status(400);
@@ -19,6 +19,8 @@ const saveMealPreferences = asyncHandler(async (req, res) => {
         persons,
         budget,
         trackingOption,
+        culturalCuisine: culturalCuisine || "",
+        unitOfMeasurement: unitOfMeasurement || "metric",
         user: req.user._id,
     });
 
@@ -28,8 +30,6 @@ const saveMealPreferences = asyncHandler(async (req, res) => {
     await user.save();
 
     // Return the updated user with preferences populated
-    // We re-fetch or just modify the user object. 
-    // Best practice: return the user structure that matches the login/profile response
     const updatedUser = await User.findById(req.user._id).select('-password').populate('mealPreferences');
 
     res.status(201).json(updatedUser);
@@ -39,10 +39,9 @@ const saveMealPreferences = asyncHandler(async (req, res) => {
 // @route   PUT /api/meal-preferences
 // @access  Private - Authenticated users only
 const updateMealPreferences = asyncHandler(async (req, res) => {
-    const { preferences, persons, budget, trackingOption } = req.body;
+    const { preferences, persons, budget, trackingOption, culturalCuisine, unitOfMeasurement } = req.body;
 
     // Find the existing preferences
-    // We can assume req.user.mealPreferences exists or find by user field
     let mealPreferences = await MealPreferences.findOne({ user: req.user._id });
 
     if (!mealPreferences) {
@@ -52,6 +51,8 @@ const updateMealPreferences = asyncHandler(async (req, res) => {
             persons,
             budget,
             trackingOption,
+            culturalCuisine: culturalCuisine || "",
+            unitOfMeasurement: unitOfMeasurement || "metric",
             user: req.user._id,
         });
 
@@ -60,10 +61,12 @@ const updateMealPreferences = asyncHandler(async (req, res) => {
         await user.save();
     } else {
         // Update fields
-        mealPreferences.preferences = preferences || mealPreferences.preferences;
-        mealPreferences.persons = persons || mealPreferences.persons;
-        mealPreferences.budget = budget || mealPreferences.budget;
-        mealPreferences.trackingOption = trackingOption || mealPreferences.trackingOption;
+        mealPreferences.preferences = preferences !== undefined ? preferences : mealPreferences.preferences;
+        mealPreferences.persons = persons !== undefined ? persons : mealPreferences.persons;
+        mealPreferences.budget = budget !== undefined ? budget : mealPreferences.budget;
+        mealPreferences.trackingOption = trackingOption !== undefined ? trackingOption : mealPreferences.trackingOption;
+        mealPreferences.culturalCuisine = culturalCuisine !== undefined ? culturalCuisine : mealPreferences.culturalCuisine;
+        mealPreferences.unitOfMeasurement = unitOfMeasurement !== undefined ? unitOfMeasurement : mealPreferences.unitOfMeasurement;
 
         await mealPreferences.save();
     }

@@ -1,0 +1,53 @@
+{
+  "meal_plan": {
+    "user_profile": {
+      "people_eating": 2,
+      "dietary_restrictions": ["Gluten-Free"],
+      "budget": "Medium"
+    },
+    "weekly_menu": [
+      {
+        "day": 1,
+        "meal_name": "Mediterranean Quinoa Bowl",
+        "type": "Vegetarian",
+        "is_gluten_free": true
+      },
+      {
+        "day": 2,
+        "meal_name": "Lemon-Garlic Roasted Chicken & Potatoes",
+        "type": "Meat-heavy",
+        "is_gluten_free": true
+      },
+      {
+        "day": 3,
+        "meal_name": "Red Lentil & Coconut Curry",
+        "type": "Vegetarian",
+        "is_gluten_free": true
+      },
+      {
+        "day": 4,
+        "meal_name": "Sweet Potato & Black Bean Corn Tacos",
+        "type": "Vegetarian",
+        "is_gluten_free": true
+      },
+      {
+        "day": 5,
+        "meal_name": "Pan-Seared Salmon with Asparagus",
+        "type": "Meat-heavy",
+        "is_gluten_free": true
+      },
+      {
+        "day": 6,
+        "meal_name": "Creamy Wild Mushroom Risotto",
+        "type": "Vegetarian",
+        "is_gluten_free": true
+      },
+      {
+        "day": 7,
+        "meal_name": "Chickpea & Spinach Coconut Stew",
+        "type": "Vegetarian",
+        "is_gluten_free": true
+      }
+    ]
+  }
+}

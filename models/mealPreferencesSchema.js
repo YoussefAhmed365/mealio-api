@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const mealPreferencesSchema = new mongoose.Schema({
     preferences: {
-        type: String,
+        type: [String],
         required: true,
         enum: [
             "No Preference", 
@@ -48,6 +48,15 @@ const mealPreferencesSchema = new mongoose.Schema({
             "Track Ingredients", 
             "No Tracking"
         ]
+    },
+    culturalCuisine: {
+        type: String,
+        default: ""
+    },
+    unitOfMeasurement: {
+        type: String,
+        enum: ["metric", "imperial"],
+        default: "metric"
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
