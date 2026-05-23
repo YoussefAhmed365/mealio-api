@@ -29,7 +29,15 @@ app.use(cors({
         if (!origin) return callback(null, true);
 
         const allowedOrigins = [corsOrigin];
-        if (allowedOrigins.indexOf(origin) !== -1 || origin.startsWith('http://192.168.') || origin.startsWith('http://10.') || origin.startsWith('http://localhost') || origin.startsWith('http://172.') || origin.startsWith('https://mealio-three.vercel.app')) {
+        if (
+            allowedOrigins.indexOf(origin) !== -1 ||
+            origin.startsWith('http://192.168.') ||
+            origin.startsWith('http://10.') ||
+            origin.startsWith('http://localhost') ||
+            origin.startsWith('http://172.') ||
+            origin.endsWith('.vercel.app') ||
+            origin === 'https://vercel.app'
+        ) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
@@ -78,3 +86,5 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server started on port ${PORT}`);
 });
+
+export default app;
