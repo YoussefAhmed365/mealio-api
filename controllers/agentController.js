@@ -57,13 +57,23 @@ function normalizeMealPlan(raw) {
     }
     
     // 3. Normalize weeklyMeals key
-    let weeklyMealsRaw = data.weeklyMeals || data.weekly_meals || data.meals || data.days || data.plan || data.meal_plan || data.mealPlan || [];
+    let weeklyMealsRaw = data.weeklyMeals || data.weekly_meals || data.weekly_menu || data.meals || data.days || data.plan || data.meal_plan || data.mealPlan || [];
     if (!Array.isArray(weeklyMealsRaw) && typeof weeklyMealsRaw === "object") {
-        // If it's an object with day keys
-        weeklyMealsRaw = Object.keys(weeklyMealsRaw).map(k => ({
-            dayOfWeek: k,
-            meals: weeklyMealsRaw[k]
-        }));
+        // If it's an object with day keys (like weekly_menu might be inside another object)
+        if (weeklyMealsRaw.weekly_menu) {
+            weeklyMealsRaw = weeklyMealsRaw.weekly_menu;
+        } else if (weeklyMealsRaw.weeklyMeals) {
+            weeklyMealsRaw = weeklyMealsRaw.weeklyMeals;
+        } else {
+            weeklyMealsRaw = Object.keys(weeklyMealsRaw).map(k => {
+                // Ignore non-day keys if the object has mixed data
+                if (['user_profile'].includes(k)) return null;
+                return {
+                    dayOfWeek: k,
+                    meals: weeklyMealsRaw[k]
+                };
+            }).filter(Boolean);
+        }
     }
     
     if (!Array.isArray(weeklyMealsRaw)) {
@@ -79,6 +89,7 @@ function normalizeMealPlan(raw) {
         if (typeof dayOfWeek === "number" || (typeof dayOfWeek === "string" && !isNaN(parseInt(dayOfWeek, 10)))) {
             const dayIndex = (parseInt(dayOfWeek, 10) - 1) % 7;
             const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            // If day 1 is Monday, dayIndex is 0
             dayOfWeek = dayNames[dayIndex >= 0 ? dayIndex : 0];
         } else if (typeof dayOfWeek === "string") {
             // Capitalize first letter to match enum Monday, Tuesday...
@@ -102,7 +113,7 @@ function normalizeMealPlan(raw) {
         }
         
         // If it's flattened, the meal name might be on the day object itself
-        if (mealsRaw.length === 0 && (dayRaw.meal || dayRaw.mealName || dayRaw.name || dayRaw.recipe || dayRaw.title)) {
+        if (mealsRaw.length === 0 && (dayRaw.meal || dayRaw.mealName || dayRaw.meal_name || dayRaw.name || dayRaw.recipe || dayRaw.title)) {
             mealsRaw = [dayRaw];
         }
         
@@ -298,9 +309,12 @@ const askAgent = asyncHandler(async (req, res) => {
     # Saving the Plan
     If the user explicitly accepts, approves, or says "Yes" to the proposed meal plan or recipe, you must follow this procedure:
     1. Output exactly one line: "[SAVE_PLAN]"
-    2. Immediately follow with a JSON representation of the entire meal plan matching this schema:
+    2. Before you output the JSON, you MUST internally generate the COMPLETE recipes for ALL meals in the approved menu. This includes every ingredient with quantities and step-by-step instructions.
+    3. Immediately follow with a JSON representation of the entire meal plan matching this schema EXACTLY:
     ${JSON.stringify(mealPlanJsonSchema, null, 2)}
-    3. Do not include any other text after the JSON.
+
+    IMPORTANT: The JSON MUST include the \`ingredients\` and \`preparationSteps\` arrays for EVERY meal. Do NOT just output the meal names. Do NOT use alternative keys like \`weekly_menu\`, use \`weeklyMeals\`.
+    4. Do not include any other text after the JSON.
     
     ---
     **Initial Greeting Example:**
